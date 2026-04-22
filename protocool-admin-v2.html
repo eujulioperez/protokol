@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROTOCOOL · Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#C17F5E;--primary-light:#EDD5C3;--bg-dark:#3D2B1F;--bg-app:#FAF7F2;--bg-card:#F6F1E9;--bg-sand:#E8DED0;--text-dark:#3D2B1F;--text-mid:#8B7355;--text-light:#C9B89A;--accent:#8A9E8C;--danger:#C0392B;--font-display:'Cormorant Garamond',serif;--font-body:'DM Sans',sans-serif;--radius:16px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font-body);background:#111;min-height:100vh;}
+.screen{display:none;min-height:100vh;}
+.screen.active{display:flex;}
+
+#s-login{flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;background:var(--bg-dark);position:relative;overflow:hidden;}
+#s-login::before{content:'';position:absolute;top:-100px;right:-80px;width:280px;height:280px;background:radial-gradient(circle,rgba(193,127,94,.22) 0%,transparent 70%);border-radius:50%;}
+#s-login::after{content:'';position:absolute;bottom:-80px;left:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(138,158,140,.14) 0%,transparent 70%);border-radius:50%;}
+.login-logo{font-family:var(--font-display);font-size:40px;font-weight:300;letter-spacing:12px;color:var(--bg-app);margin-bottom:6px;position:relative;z-index:1;}
+.login-logo span{color:var(--primary);}
+.login-badge{display:inline-block;background:rgba(193,127,94,.15);border:1px solid rgba(193,127,94,.3);border-radius:50px;padding:5px 16px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--primary);margin-bottom:40px;position:relative;z-index:1;}
+.login-card{background:rgba(255,255,255,.05);border:1px solid rgba(201,184,154,.12);border-radius:24px;padding:28px 24px;width:100%;max-width:380px;position:relative;z-index:1;}
+.login-title{font-family:var(--font-display);font-size:22px;font-weight:300;color:var(--bg-app);margin-bottom:3px;}
+.login-sub{font-size:12px;color:var(--text-light);font-weight:300;margin-bottom:22px;}
+.lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-light);margin-bottom:6px;margin-top:14px;}
+.inp{width:100%;padding:13px 14px;background:rgba(255,255,255,.07);border:1px solid rgba(201,184,154,.18);border-radius:12px;font-family:var(--font-body);font-size:14px;color:var(--bg-app);outline:none;transition:border .2s;}
+.inp:focus{border-color:var(--primary);}
+.inp::placeholder{color:rgba(201,184,154,.35);}
+.inp-light{width:100%;padding:11px 14px;background:white;border:1px solid var(--bg-sand);border-radius:12px;font-family:var(--font-body);font-size:13px;color:var(--text-dark);outline:none;transition:border .2s;}
+.inp-light:focus{border-color:var(--primary);}
+.btn-login{width:100%;margin-top:22px;padding:15px;background:var(--primary);border:none;border-radius:50px;font-family:var(--font-body);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:white;cursor:pointer;font-weight:500;}
+
+#s-panel{flex-direction:row;background:#F0EBE3;min-height:100vh;}
+.sidebar{width:240px;flex-shrink:0;background:var(--bg-dark);display:flex;flex-direction:column;padding:28px 0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sb-brand{padding:0 22px 24px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:6px;}
+.sb-logo{font-family:var(--font-display);font-size:20px;font-weight:300;letter-spacing:6px;color:var(--bg-app);}
+.sb-logo span{color:var(--primary);}
+.sb-tag{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text-light);margin-top:2px;font-weight:300;}
+.nav-group-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(201,184,154,.3);padding:14px 22px 6px;}
+.nav-item{display:flex;align-items:center;gap:11px;padding:11px 22px;cursor:pointer;border-left:3px solid transparent;color:rgba(201,184,154,.55);transition:all .15s;}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--text-light);}
+.nav-item.active{border-left-color:var(--primary);background:rgba(193,127,94,.1);color:var(--primary);}
+.nav-ico{font-size:15px;width:18px;text-align:center;}
+.nav-lbl{font-size:12px;}
+.sb-footer{margin-top:auto;padding:18px 22px;border-top:1px solid rgba(255,255,255,.07);}
+.sb-logout{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,184,154,.4);cursor:pointer;background:none;border:none;font-family:var(--font-body);}
+.sb-logout:hover{color:var(--primary);}
+
+.main{flex:1;overflow-y:auto;padding:36px;}
+.page{display:none;}
+.page.active{display:block;}
+.page-title{font-family:var(--font-display);font-size:30px;font-weight:400;color:var(--text-dark);margin-bottom:3px;}
+.page-sub{font-size:13px;color:var(--text-mid);font-weight:300;margin-bottom:28px;}
+
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-card{background:white;border-radius:var(--radius);padding:18px;border:1px solid rgba(232,222,208,.6);}
+.stat-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-mid);margin-bottom:6px;}
+.stat-val{font-family:var(--font-display);font-size:34px;font-weight:300;color:var(--text-dark);line-height:1;}
+.stat-trend{font-size:11px;color:var(--accent);margin-top:3px;}
+
+.card{background:white;border-radius:var(--radius);border:1px solid rgba(232,222,208,.6);overflow:hidden;margin-bottom:20px;}
+.card-head{padding:18px 22px;border-bottom:1px solid var(--bg-sand);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:14px;font-weight:500;color:var(--text-dark);}
+.card-body{padding:20px 22px;}
+
+.btn-primary{background:var(--primary);color:white;border:none;border-radius:50px;padding:9px 20px;font-family:var(--font-body);font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:500;}
+.btn-primary:hover{opacity:.88;}
+.btn-ghost{background:transparent;border:1.5px solid var(--bg-sand);border-radius:50px;padding:8px 18px;font-family:var(--font-body);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-mid);cursor:pointer;}
+.btn-ghost:hover{border-color:var(--primary);color:var(--primary);}
+.btn-danger{background:var(--danger);color:white;border:none;border-radius:50px;padding:8px 18px;font-family:var(--font-body);font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;}
+
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;padding:11px 22px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-mid);background:var(--bg-card);font-weight:400;}
+td{padding:13px 22px;border-top:1px solid var(--bg-sand);font-size:13px;color:var(--text-dark);}
+tr:hover td{background:var(--bg-card);}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;letter-spacing:1px;text-transform:uppercase;}
+.badge-active{background:#C4D4C6;color:#3A5C3C;}
+.badge-trial{background:var(--primary-light);color:var(--primary);}
+.badge-inactive{background:var(--bg-sand);color:var(--text-mid);}
+.badge-premium{background:var(--bg-dark);color:var(--text-light);}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.form-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-mid);}
+.form-actions{display:flex;gap:10px;margin-top:6px;}
+
+.color-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.swatch{width:38px;height:38px;border-radius:10px;border:2px solid rgba(0,0,0,.06);flex-shrink:0;cursor:pointer;overflow:hidden;position:relative;}
+.swatch input[type=color]{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);opacity:0;cursor:pointer;}
+.color-lbl{font-size:12px;font-weight:500;color:var(--text-dark);margin-bottom:1px;}
+.color-desc{font-size:11px;color:var(--text-mid);font-weight:300;}
+.color-hex{font-size:11px;color:var(--text-mid);font-family:monospace;margin-left:auto;}
+
+.preview-phone{width:220px;height:440px;background:var(--bg-app);border-radius:32px;overflow:hidden;box-shadow:0 0 0 5px #1a1410,0 0 0 7px #2a2018,0 20px 50px rgba(0,0,0,.3);flex-shrink:0;position:relative;}
+.preview-phone::before{content:'';position:absolute;top:10px;left:50%;transform:translateX(-50%);width:64px;height:16px;background:#1a1410;border-radius:10px;z-index:10;}
+.ph-header{background:var(--bg-dark);padding:32px 14px 14px;}
+.ph-greeting{font-size:9px;color:var(--text-light);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;}
+.ph-name{font-family:var(--font-display);font-size:16px;font-weight:400;color:var(--bg-app);}
+.ph-body{padding:10px;}
+.ph-card{background:var(--bg-card);border-radius:9px;padding:9px;margin-bottom:5px;border-left:2px solid var(--primary);}
+.ph-card-name{font-size:10px;font-weight:500;color:var(--text-dark);}
+.ph-card-time{font-size:9px;color:var(--text-mid);}
+.ph-prog{background:var(--bg-card);border-radius:9px;padding:9px;margin-bottom:5px;}
+.ph-prog-lbl{font-size:8px;color:var(--text-mid);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
+.ph-prog-track{height:3px;background:var(--bg-sand);border-radius:2px;overflow:hidden;}
+.ph-prog-fill{height:100%;background:var(--primary);border-radius:2px;width:67%;}
+
+.notif-item{background:var(--bg-card);border-radius:var(--radius);padding:16px;margin-bottom:10px;border-left:3px solid var(--primary);}
+.notif-item-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.notif-type{font-size:11px;color:var(--text-mid);font-weight:300;}
+.toggle{width:36px;height:20px;background:var(--accent);border-radius:10px;position:relative;cursor:pointer;transition:background .2s;}
+.toggle::after{content:'';position:absolute;top:3px;right:3px;width:14px;height:14px;background:white;border-radius:50%;transition:all .2s;}
+.toggle.off{background:var(--bg-sand);}
+.toggle.off::after{right:auto;left:3px;}
+.notif-inp{width:100%;padding:9px 12px;border:1px solid var(--bg-sand);border-radius:10px;font-family:var(--font-body);font-size:13px;color:var(--text-dark);outline:none;margin-bottom:8px;background:white;}
+.notif-inp:focus{border-color:var(--primary);}
+textarea.notif-inp{resize:none;line-height:1.5;font-size:12px;color:var(--text-mid);}
+
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.plan-card{background:white;border-radius:var(--radius);padding:20px;border:1px solid rgba(232,222,208,.6);}
+.plan-card.featured{border:2px solid var(--primary);}
+.plan-name-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-mid);margin-bottom:10px;}
+.plan-price-inp{font-family:var(--font-display);font-size:28px;font-weight:300;color:var(--text-dark);border:none;border-bottom:2px solid var(--bg-sand);outline:none;width:80%;background:transparent;padding:4px 0;}
+.plan-price-inp:focus{border-bottom-color:var(--primary);}
+
+.com-preview{background:var(--bg-dark);border-radius:var(--radius);padding:20px;margin-top:14px;}
+.com-prev-title{font-family:var(--font-display);font-size:18px;font-weight:400;color:var(--bg-app);margin-bottom:6px;}
+.com-prev-body{font-size:13px;color:var(--text-light);font-weight:300;line-height:1.7;}
+.com-prev-footer{font-size:10px;color:rgba(201,184,154,.4);margin-top:12px;letter-spacing:1px;text-transform:uppercase;}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:24px;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:24px;width:100%;max-width:540px;max-height:80vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.3);}
+.modal-head{padding:22px 22px 16px;border-bottom:1px solid var(--bg-sand);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:white;z-index:1;}
+.modal-title{font-family:var(--font-display);font-size:22px;font-weight:400;color:var(--text-dark);}
+.modal-close{background:var(--bg-sand);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:15px;}
+.modal-body{padding:18px 22px;}
+.proto-item{display:flex;align-items:center;gap:10px;background:var(--bg-card);border-radius:11px;padding:11px 13px;margin-bottom:6px;border-left:3px solid var(--primary);}
+.proto-item-emo{font-size:17px;flex-shrink:0;}
+.proto-item-meta{flex:1;}
+.proto-item-name{font-size:13px;font-weight:500;color:var(--text-dark);margin-bottom:1px;}
+.proto-item-time{font-size:11px;color:var(--text-mid);font-weight:300;}
+.proto-item-del{background:none;border:none;color:var(--text-light);cursor:pointer;font-size:18px;line-height:1;}
+.proto-item-del:hover{color:var(--danger);}
+
+select.inp-light{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B7355' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--bg-dark);color:var(--bg-app);padding:11px 22px;border-radius:50px;font-size:12px;letter-spacing:1px;box-shadow:0 8px 32px rgba(0,0,0,.4);z-index:999;transition:transform .3s;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+@media(max-width:900px){.sidebar{display:none;}.stats-grid{grid-template-columns:1fr 1fr;}.plan-grid{grid-template-columns:1fr;}.form-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="s-login" class="screen active">
+  <div class="login-logo">PROTOC<span>OO</span>L</div>
+  <div class="login-badge">Acesso Administrador</div>
+  <div class="login-card">
+    <div class="login-title">Painel de controle</div>
+    <div class="login-sub">Acesso restrito ao proprietário</div>
+    <div class="lbl">E-mail</div>
+    <input class="inp" id="al-email" type="email" placeholder="seu@email.com">
+    <div class="lbl">Senha</div>
+    <input class="inp" id="al-pass" type="password" placeholder="••••••••">
+    <button class="btn-login" onclick="adminLogin()">Entrar no painel</button>
+  </div>
+</div>
+
+<!-- PANEL -->
+<div id="s-panel" class="screen">
+  <div class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">PROTOC<span>OO</span>L</div>
+      <div class="sb-tag">Painel Admin</div>
+    </div>
+    <div class="nav-group-label">Visão geral</div>
+    <div class="nav-item active" onclick="goPage('dashboard',this)"><span class="nav-ico">📊</span><span class="nav-lbl">Dashboard</span></div>
+    <div class="nav-item" onclick="goPage('users',this)"><span class="nav-ico">👥</span><span class="nav-lbl">Usuários</span></div>
+    <div class="nav-group-label">Configurações</div>
+    <div class="nav-item" onclick="goPage('notifications',this)"><span class="nav-ico">🔔</span><span class="nav-lbl">Notificações</span></div>
+    <div class="nav-item" onclick="goPage('comunicados',this)"><span class="nav-ico">📣</span><span class="nav-lbl">Comunicados</span></div>
+    <div class="nav-item" onclick="goPage('plans',this)"><span class="nav-ico">💳</span><span class="nav-lbl">Planos & Preços</span></div>
+    <div class="nav-item" onclick="goPage('theme',this)"><span class="nav-ico">🎨</span><span class="nav-lbl">Aparência</span></div>
+    <div class="nav-item" onclick="goPage('config',this)"><span class="nav-ico">⚙️</span><span class="nav-lbl">Configurações</span></div>
+    <div class="sb-footer">
+      <button class="sb-logout" onclick="adminLogout()">← Sair do painel</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub" id="dash-date">Carregando...</div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-lbl">Usuários</div><div class="stat-val" id="st-users">0</div><div class="stat-trend">↗ total cadastrado</div></div>
+        <div class="stat-card"><div class="stat-lbl">Premium</div><div class="stat-val" id="st-premium">0</div><div class="stat-trend">plano pago</div></div>
+        <div class="stat-card"><div class="stat-lbl">Receita/mês</div><div class="stat-val" id="st-revenue">R$0</div><div class="stat-trend">estimado</div></div>
+        <div class="stat-card"><div class="stat-lbl">Comunicados</div><div class="stat-val" id="st-msgs">0</div><div class="stat-trend">enviados</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Últimos cadastros</div><button class="btn-primary" onclick="goPage('users',null)">Ver todos</button></div>
+        <table><thead><tr><th>Nome</th><th>E-mail</th><th>Plano</th><th>Cadastro</th><th>Status</th><th></th></tr></thead><tbody id="dash-table"></tbody></table>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div id="page-users" class="page">
+      <div class="page-title">Usuários</div>
+      <div class="page-sub">Gerencie todos os cadastros</div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title" id="users-count">Usuários</div>
+          <input class="inp-light" id="user-search" placeholder="🔍  Buscar..." style="width:220px" oninput="filterUsers()">
+        </div>
+        <table><thead><tr><th>Nome</th><th>E-mail</th><th>Plano</th><th>Cadastro</th><th>Status</th><th>Ações</th></tr></thead><tbody id="users-table"></tbody></table>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div id="page-notifications" class="page">
+      <div class="page-title">Notificações</div>
+      <div class="page-sub">Edite os textos dos lembretes enviados no app</div>
+      <div id="notif-list"></div>
+      <button class="btn-primary" onclick="addNotif()">+ Nova notificação</button>
+    </div>
+
+    <!-- COMUNICADOS -->
+    <div id="page-comunicados" class="page">
+      <div class="page-title">Comunicados</div>
+      <div class="page-sub">Envie mensagens para todos os usuários</div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Novo comunicado</div></div>
+        <div class="card-body">
+          <div class="form-group"><div class="form-label">Título</div><input class="inp-light" id="com-title" placeholder="Ex: Nova funcionalidade!" oninput="updatePreview()"></div>
+          <div class="form-group"><div class="form-label">Mensagem</div><textarea class="inp-light" id="com-body" rows="4" placeholder="Sua mensagem aqui..." oninput="updatePreview()" style="resize:none;line-height:1.6"></textarea></div>
+          <div class="form-group"><div class="form-label">Destinatários</div><select class="inp-light" id="com-target"><option value="all">Todos os usuários</option><option value="premium">Apenas Premium</option><option value="free">Apenas gratuito</option></select></div>
+          <div class="com-preview">
+            <div class="com-prev-title" id="com-prev-title">Título do comunicado</div>
+            <div class="com-prev-body" id="com-prev-body">Sua mensagem aparecerá aqui...</div>
+            <div class="com-prev-footer">PROTOCOOL · agora</div>
+          </div>
+          <div class="form-actions" style="margin-top:16px">
+            <button class="btn-primary" onclick="sendComunicado()">📣 Enviar comunicado</button>
+            <button class="btn-ghost" onclick="clearCom()">Limpar</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Histórico</div></div>
+        <table><thead><tr><th>Título</th><th>Destinatários</th><th>Data</th><th>Status</th></tr></thead><tbody id="com-history"></tbody></table>
+      </div>
+    </div>
+
+    <!-- PLANS -->
+    <div id="page-plans" class="page">
+      <div class="page-title">Planos & Preços</div>
+      <div class="page-sub">Configure valores e benefícios</div>
+      <div class="plan-grid">
+        <div class="plan-card">
+          <div class="plan-name-lbl">Gratuito</div>
+          <div style="font-family:var(--font-display);font-size:32px;font-weight:300;color:var(--text-dark);margin-bottom:3px">R$0</div>
+          <div style="font-size:12px;color:var(--text-mid);margin-bottom:14px">para sempre</div>
+          <div class="form-group"><div class="form-label">Limite de lembretes</div><input class="inp-light" id="free-limit" value="3" type="number" min="1" max="20" oninput="document.getElementById('free-lim-preview').textContent=this.value"></div>
+          <div style="font-size:12px;color:var(--text-dark);line-height:2.2">✓ Até <span id="free-lim-preview">3</span> lembretes<br>✓ 1 categoria<br>✗ Relatórios<br>✗ Scanner IA<br>✗ Wearables</div>
+        </div>
+        <div class="plan-card featured">
+          <div class="plan-name-lbl" style="color:var(--primary)">Premium Mensal</div>
+          <div style="display:flex;align-items:baseline;gap:3px;margin-bottom:3px"><span style="font-family:var(--font-display);font-size:16px;color:var(--text-mid)">R$</span><input class="plan-price-inp" id="price-monthly" value="19" type="number" min="1"></div>
+          <div style="font-size:12px;color:var(--text-mid);margin-bottom:14px">/mês</div>
+          <div style="font-size:12px;color:var(--text-dark);line-height:2.2">✓ Ilimitado<br>✓ Todas as categorias<br>✓ Relatórios avançados<br>✓ Scanner IA<br>✓ Wearables</div>
+        </div>
+        <div class="plan-card">
+          <div class="plan-name-lbl">Premium Anual</div>
+          <div style="display:flex;align-items:baseline;gap:3px;margin-bottom:3px"><span style="font-family:var(--font-display);font-size:16px;color:var(--text-mid)">R$</span><input class="plan-price-inp" id="price-annual" value="9" type="number" min="1"></div>
+          <div style="font-size:12px;color:var(--text-mid);margin-bottom:14px">/mês · cobrado anualmente</div>
+          <div style="font-size:12px;color:var(--text-dark);line-height:2.2">✓ Tudo do mensal<br>✓ 50% de desconto<br>✓ Suporte prioritário<br>✓ Acesso beta<br>✓ Sem anúncios</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn-primary" onclick="savePlans()">Salvar preços</button>
+        <button class="btn-ghost" onclick="loadPlans()">Restaurar</button>
+      </div>
+    </div>
+
+    <!-- THEME -->
+    <div id="page-theme" class="page">
+      <div class="page-title">Aparência</div>
+      <div class="page-sub">Altere cores e fontes do app em tempo real</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head"><div class="card-title">Cores</div></div>
+          <div class="card-body">
+            <div class="color-row"><div class="swatch" id="sw-p" style="background:#C17F5E"><input type="color" value="#C17F5E" oninput="updColor('--primary',this.value,'sw-p','hx-p')"></div><div><div class="color-lbl">Cor principal</div><div class="color-desc">Botões, destaques</div></div><div class="color-hex" id="hx-p">#C17F5E</div></div>
+            <div class="color-row"><div class="swatch" id="sw-d" style="background:#3D2B1F"><input type="color" value="#3D2B1F" oninput="updColor('--bg-dark',this.value,'sw-d','hx-d')"></div><div><div class="color-lbl">Header escuro</div><div class="color-desc">Topo do app</div></div><div class="color-hex" id="hx-d">#3D2B1F</div></div>
+            <div class="color-row"><div class="swatch" id="sw-b" style="background:#FAF7F2"><input type="color" value="#FAF7F2" oninput="updColor('--bg-app',this.value,'sw-b','hx-b')"></div><div><div class="color-lbl">Fundo do app</div><div class="color-desc">Background geral</div></div><div class="color-hex" id="hx-b">#FAF7F2</div></div>
+            <div class="color-row"><div class="swatch" id="sw-a" style="background:#8A9E8C"><input type="color" value="#8A9E8C" oninput="updColor('--accent',this.value,'sw-a','hx-a')"></div><div><div class="color-lbl">Acento</div><div class="color-desc">Tarefas concluídas</div></div><div class="color-hex" id="hx-a">#8A9E8C</div></div>
+            <button class="btn-primary" style="width:100%;margin-top:6px" onclick="saveTheme()">Salvar e aplicar</button>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head"><div class="card-title">Tipografia</div></div>
+          <div class="card-body">
+            <div class="form-group"><div class="form-label">Fonte de títulos</div><select class="inp-light" onchange="updFont('display',this.value)"><option value="'Cormorant Garamond',serif">Cormorant Garamond</option><option value="'Playfair Display',serif">Playfair Display</option><option value="'DM Serif Display',serif">DM Serif Display</option><option value="'DM Sans',sans-serif">DM Sans</option></select></div>
+            <div class="form-group"><div class="form-label">Fonte do corpo</div><select class="inp-light" onchange="updFont('body',this.value)"><option value="'DM Sans',sans-serif">DM Sans</option><option value="'Inter',sans-serif">Inter</option><option value="'Nunito',sans-serif">Nunito</option><option value="'Lato',sans-serif">Lato</option></select></div>
+            <div style="background:var(--bg-card);border-radius:12px;padding:14px">
+              <div style="font-family:var(--font-display);font-size:18px;font-weight:300;color:var(--text-dark);margin-bottom:3px">Bom dia, Billie</div>
+              <div style="font-family:var(--font-body);font-size:12px;color:var(--text-mid);font-weight:300">Hora do pré-treino · 07:00</div>
+            </div>
+            <button class="btn-primary" style="width:100%;margin-top:14px" onclick="saveTheme()">Salvar tipografia</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Preview ao vivo</div></div>
+        <div class="card-body" style="display:flex;gap:24px;align-items:flex-start">
+          <div class="preview-phone">
+            <div class="ph-header" style="background:var(--bg-dark)"><div class="ph-greeting">Bom dia</div><div class="ph-name" style="font-family:var(--font-display);color:var(--bg-app)">Billie</div></div>
+            <div class="ph-body">
+              <div class="ph-prog"><div class="ph-prog-lbl">Progresso do dia</div><div class="ph-prog-track"><div class="ph-prog-fill" style="background:var(--primary)"></div></div></div>
+              <div class="ph-card" style="border-left-color:var(--primary);background:var(--primary-light)"><div class="ph-card-name" style="font-family:var(--font-body)">Pré-treino</div><div class="ph-card-time">07:00 · agora</div></div>
+              <div class="ph-card" style="border-left-color:var(--accent);opacity:.6"><div class="ph-card-name" style="font-family:var(--font-body)">Whey Protein ✓</div><div class="ph-card-time">06:30 · concluído</div></div>
+            </div>
+          </div>
+          <div style="flex:1;font-size:12px;color:var(--text-mid);line-height:2;font-weight:300">✦ Alterações refletem no preview em tempo real.<br>✦ Ao salvar, todos os usuários verão o novo visual.<br>✦ Teste antes de publicar.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFIG -->
+    <div id="page-config" class="page">
+      <div class="page-title">Configurações</div>
+      <div class="page-sub">Dados do app e credenciais de acesso</div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Dados do aplicativo</div></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group"><div class="form-label">Nome do app</div><input class="inp-light" id="cfg-appname" value="PROTOCOOL"></div>
+            <div class="form-group"><div class="form-label">Slogan</div><input class="inp-light" id="cfg-slogan" value="sua rotina. seu ritual."></div>
+          </div>
+          <button class="btn-primary" onclick="saveConfig()">Salvar dados</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Alterar credenciais admin</div></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group"><div class="form-label">Novo e-mail admin</div><input class="inp-light" id="cfg-email" type="email" placeholder="novo@email.com"></div>
+            <div class="form-group"><div class="form-label">Nova senha</div><input class="inp-light" id="cfg-pass" type="password" placeholder="Mínimo 8 caracteres"></div>
+          </div>
+          <button class="btn-primary" onclick="saveCredentials()">Atualizar credenciais</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL USUÁRIO -->
+<div class="modal-overlay" id="user-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-user-name">—</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px">
+        <div style="background:var(--bg-card);border-radius:12px;padding:14px"><div style="font-size:10px;color:var(--text-mid);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Plano</div><div style="font-size:14px;font-weight:500;color:var(--text-dark)" id="modal-plan">—</div></div>
+        <div style="background:var(--bg-card);border-radius:12px;padding:14px"><div style="font-size:10px;color:var(--text-mid);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Sequência</div><div style="font-size:14px;font-weight:500;color:var(--text-dark)">14 dias 🔥</div></div>
+        <div style="background:var(--bg-card);border-radius:12px;padding:14px"><div style="font-size:10px;color:var(--text-mid);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Adesão</div><div style="font-size:14px;font-weight:500;color:var(--text-dark)">87%</div></div>
+      </div>
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-mid);margin-bottom:10px">Protocolo do usuário</div>
+      <div id="modal-protocol">
+        <div class="proto-item"><div class="proto-item-emo">💊</div><div class="proto-item-meta"><div class="proto-item-name">Whey Protein</div><div class="proto-item-time">06:30 · ao acordar</div></div><button class="proto-item-del" onclick="this.closest('.proto-item').remove()">×</button></div>
+        <div class="proto-item"><div class="proto-item-emo">⚡</div><div class="proto-item-meta"><div class="proto-item-name">Pré-treino</div><div class="proto-item-time">30min antes</div></div><button class="proto-item-del" onclick="this.closest('.proto-item').remove()">×</button></div>
+        <div class="proto-item"><div class="proto-item-emo">💧</div><div class="proto-item-meta"><div class="proto-item-name">Hidratação</div><div class="proto-item-time">07:00 · 500ml</div></div><button class="proto-item-del" onclick="this.closest('.proto-item').remove()">×</button></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn-primary" onclick="closeModal();toast('Alterações salvas ✓')">Salvar alterações</button>
+        <button class="btn-danger" onclick="closeModal();toast('Usuário excluído')">Excluir usuário</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast-el"></div>
+
+<script>
+let ADMIN = JSON.parse(localStorage.getItem('pc-admin-creds')||'null')||{email:'admin@protocool.com',pass:'admin123'};
+let notifs = JSON.parse(localStorage.getItem('pc-notifs')||'null')||[
+  {id:1,type:'💊 Suplemento',title:'Hora do pré-treino',msg:'Seu treino começa em 30 minutos. Já tomou seu pré-treino?',active:true},
+  {id:2,type:'💧 Hidratação',title:'Hora de se hidratar',msg:'Chegou na metade do dia. Já bebeu água suficiente? Meta: 2L.',active:true},
+  {id:3,type:'🏋️ Treino',title:'Bora treinar!',msg:'Seu treino começa em 1 hora. Prepare-se!',active:true},
+  {id:4,type:'😴 Sono',title:'Hora de descansar',msg:'Recuperação é tão importante quanto o treino.',active:false},
+  {id:5,type:'🌅 Manhã',title:'Bom dia, seu protocolo começa agora',msg:'Novo dia, nova chance de ser consistente. Vamos lá!',active:true},
+];
+let comunicados = JSON.parse(localStorage.getItem('pc-comunicados')||'[]');
+
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function goPage(name,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+  if(el)el.classList.add('active');
+  if(name==='dashboard')loadDashboard();
+  if(name==='users')loadUsers();
+  if(name==='notifications')renderNotifs();
+  if(name==='comunicados')renderComs();
+  if(name==='plans')loadPlans();
+}
+
+function adminLogin(){
+  const email=document.getElementById('al-email').value.trim();
+  const pass=document.getElementById('al-pass').value;
+  if(email===ADMIN.email&&pass===ADMIN.pass){sessionStorage.setItem('pc-admin-auth','1');show('s-panel');loadDashboard();toast('Bem-vindo ao painel ✓');}
+  else toast('Credenciais incorretas');
+}
+function adminLogout(){sessionStorage.removeItem('pc-admin-auth');show('s-login');}
+
+function getUsers(){return JSON.parse(localStorage.getItem('pc-users')||'[]');}
+
+function loadDashboard(){
+  const users=getUsers();
+  const premium=users.filter(u=>u.plano==='premium').length;
+  const monthly=parseFloat(localStorage.getItem('pc-price-monthly')||19);
+  document.getElementById('dash-date').textContent='Visão geral · '+new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('st-users').textContent=users.length;
+  document.getElementById('st-premium').textContent=premium;
+  document.getElementById('st-revenue').textContent='R$'+(premium*monthly);
+  document.getElementById('st-msgs').textContent=comunicados.length;
+  document.getElementById('dash-table').innerHTML=users.slice(0,5).map(u=>userRow(u)).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--text-mid);padding:24px">Nenhum usuário ainda</td></tr>';
+}
+
+function loadUsers(){
+  const users=getUsers();
+  document.getElementById('users-count').textContent=`Usuários (${users.length})`;
+  document.getElementById('users-table').innerHTML=users.map(u=>userRow(u,true)).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--text-mid);padding:24px">Nenhum usuário cadastrado ainda</td></tr>';
+}
+function userRow(u,full=false){
+  return`<tr><td><strong>${u.nome}</strong></td><td style="color:var(--text-mid)">${u.email}</td><td><span class="badge ${u.plano==='premium'?'badge-premium':'badge-trial'}">${u.plano||'gratuito'}</span></td><td style="color:var(--text-mid)">${new Date(u.desde).toLocaleDateString('pt-BR')}</td>${full?'':''}<td><span class="badge badge-active">Ativo</span></td><td><button class="btn-ghost" style="padding:5px 12px;font-size:10px" onclick="openModal('${u.nome}','${u.plano||'gratuito'}')">Ver</button></td></tr>`;
+}
+function filterUsers(){
+  const q=document.getElementById('user-search').value.toLowerCase();
+  const users=getUsers().filter(u=>u.nome.toLowerCase().includes(q)||u.email.toLowerCase().includes(q));
+  document.getElementById('users-table').innerHTML=users.map(u=>userRow(u,true)).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--text-mid);padding:24px">Sem resultados</td></tr>';
+}
+
+function openModal(nome,plano){document.getElementById('modal-user-name').textContent=nome;document.getElementById('modal-plan').textContent=plano;document.getElementById('user-modal').classList.add('open');}
+function closeModal(){document.getElementById('user-modal').classList.remove('open');}
+
+function renderNotifs(){
+  document.getElementById('notif-list').innerHTML=notifs.map((n,i)=>`
+    <div class="notif-item">
+      <div class="notif-item-head"><div class="notif-type">${n.type}</div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;color:var(--text-mid)">${n.active?'Ativo':'Inativo'}</span><div class="toggle ${n.active?'':'off'}" onclick="toggleNotif(${i})"></div></div></div>
+      <input class="notif-inp" value="${n.title}" oninput="notifs[${i}].title=this.value" placeholder="Título">
+      <textarea class="notif-inp" rows="2" oninput="notifs[${i}].msg=this.value">${n.msg}</textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="btn-ghost" style="padding:5px 14px;font-size:10px" onclick="saveNotif(${i})">Salvar</button></div>
+    </div>`).join('');
+}
+function toggleNotif(i){notifs[i].active=!notifs[i].active;localStorage.setItem('pc-notifs',JSON.stringify(notifs));renderNotifs();toast('Atualizado ✓');}
+function saveNotif(i){localStorage.setItem('pc-notifs',JSON.stringify(notifs));toast('Notificação salva ✓');}
+function addNotif(){notifs.push({id:Date.now(),type:'🔔 Personalizado',title:'Nova notificação',msg:'Digite sua mensagem.',active:true});renderNotifs();}
+
+function updatePreview(){
+  document.getElementById('com-prev-title').textContent=document.getElementById('com-title').value||'Título do comunicado';
+  document.getElementById('com-prev-body').textContent=document.getElementById('com-body').value||'Sua mensagem aparecerá aqui...';
+}
+function sendComunicado(){
+  const title=document.getElementById('com-title').value.trim();
+  const body=document.getElementById('com-body').value.trim();
+  const target=document.getElementById('com-target').value;
+  if(!title||!body){toast('Preencha título e mensagem');return;}
+  comunicados.unshift({title,body,target,date:new Date().toISOString()});
+  localStorage.setItem('pc-comunicados',JSON.stringify(comunicados));
+  document.getElementById('st-msgs').textContent=comunicados.length;
+  renderComs();clearCom();toast('Comunicado enviado ✓');
+}
+function clearCom(){document.getElementById('com-title').value='';document.getElementById('com-body').value='';updatePreview();}
+function renderComs(){
+  const tgt={all:'Todos',premium:'Premium',free:'Gratuito'};
+  document.getElementById('com-history').innerHTML=comunicados.map(c=>`<tr><td><strong>${c.title}</strong></td><td>${tgt[c.target]||'Todos'}</td><td style="color:var(--text-mid)">${new Date(c.date).toLocaleDateString('pt-BR')}</td><td><span class="badge badge-active">Enviado</span></td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--text-mid);padding:24px">Nenhum comunicado ainda</td></tr>';
+}
+
+function loadPlans(){
+  const m=localStorage.getItem('pc-price-monthly'),a=localStorage.getItem('pc-price-annual'),l=localStorage.getItem('pc-free-limit');
+  if(m)document.getElementById('price-monthly').value=m;
+  if(a)document.getElementById('price-annual').value=a;
+  if(l){document.getElementById('free-limit').value=l;document.getElementById('free-lim-preview').textContent=l;}
+}
+function savePlans(){
+  localStorage.setItem('pc-price-monthly',document.getElementById('price-monthly').value);
+  localStorage.setItem('pc-price-annual',document.getElementById('price-annual').value);
+  const l=document.getElementById('free-limit').value;
+  localStorage.setItem('pc-free-limit',l);
+  document.getElementById('free-lim-preview').textContent=l;
+  toast('Preços salvos ✓');
+}
+
+function updColor(v,val,sw,hx){document.documentElement.style.setProperty(v,val);document.getElementById(sw).style.background=val;document.getElementById(hx).textContent=val;if(v==='--primary')document.documentElement.style.setProperty('--primary-light',val+'22');}
+function updFont(t,v){document.documentElement.style.setProperty(t==='display'?'--font-display':'--font-body',v);}
+function saveTheme(){
+  const t={primary:getComputedStyle(document.documentElement).getPropertyValue('--primary').trim(),bgDark:getComputedStyle(document.documentElement).getPropertyValue('--bg-dark').trim(),bgApp:getComputedStyle(document.documentElement).getPropertyValue('--bg-app').trim(),accent:getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),fontDisplay:getComputedStyle(document.documentElement).getPropertyValue('--font-display').trim(),fontBody:getComputedStyle(document.documentElement).getPropertyValue('--font-body').trim()};
+  localStorage.setItem('pc-theme',JSON.stringify(t));toast('Tema salvo ✓');
+}
+
+function saveConfig(){localStorage.setItem('pc-config',JSON.stringify({appName:document.getElementById('cfg-appname').value,slogan:document.getElementById('cfg-slogan').value}));toast('Configurações salvas ✓');}
+function saveCredentials(){
+  const email=document.getElementById('cfg-email').value.trim();
+  const pass=document.getElementById('cfg-pass').value;
+  if(!email||!pass){toast('Preencha e-mail e senha');return;}
+  if(pass.length<8){toast('Senha mínima de 8 caracteres');return;}
+  ADMIN={email,pass};localStorage.setItem('pc-admin-creds',JSON.stringify(ADMIN));
+  document.getElementById('cfg-email').value='';document.getElementById('cfg-pass').value='';
+  toast('Credenciais atualizadas ✓');
+}
+
+function toast(msg){const t=document.getElementById('toast-el');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+if(sessionStorage.getItem('pc-admin-auth')){show('s-panel');loadDashboard();}
+</script>
+</body>
+</html>
